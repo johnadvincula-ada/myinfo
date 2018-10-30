@@ -17,7 +17,20 @@ $ composer require carropublic/myinfo
 
 ## Usage
 
-Clone to packages/CarroPublic
+Clone to `packages/CarroPublic` and move `ssl` folder to `storage` folder.
+
+Setup Environment
+
+	MYINFO_AUTHORIZE_API=https://myinfosgstg.api.gov.sg/test/v2/authorise
+	MYINFO_TOKEN_API=https://myinfosgstg.api.gov.sg/test/v2/token
+	MYINFO_PERSON_API=https://myinfosgstg.api.gov.sg/test/v2/person
+	MYINFO_CALLBACK_URL=http://localhost:3001/callback
+	MYINFO_CLIENT_ID=STG2-MYINFO-SELF-TEST
+	MYINFO_CLIENT_SECRET=44d953c796cccebcec9bdc826852857ab412fbe2
+	MYINFO_REALM=realm
+	MY_INFO_PRIVATE_KEY=ssl/public.pem
+	MY_INFO_PUBLIC_KEY=ssl/private.pem
+	MYINFO_ATTRIBUTES="name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,assessableincome,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
 
 ## Change log
 
