@@ -1,0 +1,43 @@
+{
+    "name": "carropublic/myinfo",
+    "description": ":description",
+    "license": "license",
+    "authors": [
+        {
+            "name": "author name",
+            "email": "author email",
+            "homepage": "author homepage"
+        }
+    ],
+    "homepage": "https://github.com/carropublic/myinfo",
+    "keywords": ["Laravel", "MyInfo"],
+    "require": {
+        "illuminate/support": "~5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~7.0",
+        "mockery/mockery": "^1.1",
+        "orchestra/testbench": "~3.0",
+        "sempro/phpunit-pretty-print": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CarroPublic\\MyInfo\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CarroPublic\\MyInfo\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CarroPublic\\MyInfo\\MyInfoServiceProvider"
+            ],
+            "aliases": {
+                "MyInfo": "CarroPublic\\MyInfo\\Facades\\MyInfo"
+            }
+        }
+    }
+}
