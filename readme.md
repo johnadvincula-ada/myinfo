@@ -17,6 +17,8 @@ $ composer require carropublic/myinfo
 
 ## Usage
 
+Clone to packages/CarroPublic
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
