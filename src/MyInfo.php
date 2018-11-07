@@ -28,6 +28,7 @@ class MyInfo
                     $nonceValue."&apex_l2_eg_signature_method=SHA256withRSA&apex_l2_eg_timestamp=".
                     $time."&apex_l2_eg_version=1.0&client_id=STG2-MYINFO-SELF-TEST&client_secret=44d953c796cccebcec9bdc826852857ab412fbe2&code=".
                     $code ."&grant_type=authorization_code&redirect_uri=http://localhost:3001/callback";
+
         \Log::info('Base String '. $baseString);
 
         $signature = $this->getSignature($baseString);
@@ -37,10 +38,11 @@ class MyInfo
         $headers = [
             'Content-Type' => 'application/x-www-form-urlencoded',
             'Cache-Control' => 'no-cache',
-            'Authorization' => "Apex_L2_Eg realm=\"realm\",apex_l2_eg_app_id=\"STG2-MYINFO-SELF-TEST\",apex_l2_eg_nonce=\"{$nonceValue}\",apex_l2_eg_signature_method=\"SHA256withRSA\",apex_l2_eg_signature=\"{$signature}\",apex_l2_eg_timestamp=\"{$time}\",apex_l2_eg_version=\"1.0\"",                     
+            'Authorization' => "Apex_L2_Eg realm=\"http://localhost:3001\",apex_l2_eg_app_id=\"STG2-MYINFO-SELF-TEST\",apex_l2_eg_nonce=\"{$nonceValue}\",apex_l2_eg_signature_method=\"SHA256withRSA\",apex_l2_eg_signature=\"{$signature}\",apex_l2_eg_timestamp=\"{$time}\",apex_l2_eg_version=\"1.0\"",
         ];
 
-        \Log::info($headers['Authorization']);
+        \Log::info(json_encode($headers));
+        \Log::info('Authorization: ' . $headers['Authorization']);
 
         $client = new Client();
         $request = $client->request('POST','https://myinfosgstg.api.gov.sg/test/v2/token', [
