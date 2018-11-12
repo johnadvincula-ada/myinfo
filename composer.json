@@ -1,12 +1,12 @@
 {
     "name": "carropublic/myinfo",
     "description": ":description",
-    "license": "license",
+    "license": "MIT",
     "authors": [
         {
-            "name": "author name",
-            "email": "author email",
-            "homepage": "author homepage"
+            "name": "Set Kyar Wa Lar <Universe>",
+            "email": "universe@carro.co",
+            "homepage": "https://carro.sg"
         }
     ],
     "homepage": "https://github.com/carropublic/myinfo",
