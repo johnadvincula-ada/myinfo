@@ -64,8 +64,6 @@ license. Please see the [license file](license.md) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/carropublic/myinfo.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/carropublic/myinfo.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/carropublic/myinfo/master.svg?style=flat-square
-[ico-styleci]: https://styleci.io/repos/12345678/shield
 
 [link-packagist]: https://packagist.org/packages/carropublic/myinfo
 [link-downloads]: https://packagist.org/packages/carropublic/myinfo
