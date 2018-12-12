@@ -159,7 +159,7 @@ class MyInfo
     }
 
     /**
-     * [getJWTPayload description]
+     * Get JWT Payload
      * 
      * @param  string $jwtAccessToken JWT Access Token
      * @return array                  Payload of JWT
