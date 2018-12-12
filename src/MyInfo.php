@@ -217,11 +217,11 @@ class MyInfo
     /**
      * Generate SHA256 with RSAHeader
      * 
-     * @param  string $url            [description]
-     * @param  string $params         [description]
-     * @param  string $method         [description]
-     * @param  string $strContentType [description]
-     * @param  string $appId          [description]
+     * @param  string $url            URL
+     * @param  string $params         Parameter for header
+     * @param  string $method         Method for header generation
+     * @param  string $strContentType Content Type for header 
+     * @param  string $appId          AppId of MyInfo
      * @param  string $keyCertContent PrivateKey content string
      * @param  string $passphrase     Client secret of my info
      * @param  string $realm          URL
