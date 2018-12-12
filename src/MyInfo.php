@@ -72,6 +72,14 @@ class MyInfo
         );
     }
 
+    /**
+     * Create person requests
+     * 
+     * @param  string $userUniFin     Fin of the person
+     * @param  string $jwtAccessToken JWT access token
+     * @param  string $privateKey     Private Key
+     * @return mixed
+     */
     public function createPersonRequest($userUniFin, $jwtAccessToken, $privateKey)
     {
         $url            = config('myinfo.api.personal') . '/' . $userUniFin . '/';
@@ -150,6 +158,29 @@ class MyInfo
         return $userData->getPayload();
     }
 
+    /**
+     * [getJWTPayload description]
+     * 
+     * @param  string $jwtAccessToken JWT Access Token
+     * @return array                  Payload of JWT
+     */
+    public function getJWTPayload($jwtAccessToken)
+    {
+        list($header, $payload, $signature) = explode (".", $jwtAccessToken);
+
+        return json_decode(base64_decode($payload), true);
+    }
+
+    /**
+     * Request with CURL
+     * 
+     * @param  string $url         URL to Request
+     * @param  string $method      METHOD of the request
+     * @param  string $authHeaders Auth
+     * @param  array  $headers     Request headers
+     * @param  string $params      Parameter of the request
+     * @return mixed
+     */
     private function requestWithCurl($url, $method, $authHeaders=null, $headers=null, $params=null)
     {
         $request = curl_init($url);

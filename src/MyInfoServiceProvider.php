@@ -61,6 +61,11 @@ class MyInfoServiceProvider extends ServiceProvider
             __DIR__.'/../config/myinfo.php' => config_path('myinfo.php'),
         ], 'myinfo.config');
 
+        $this->publishes([
+            __DIR__.'/../ssl/private.pem' => storage_path('ssl'),
+            __DIR__.'/../ssl/public.pem'  => storage_path('ssl'),
+        ]);
+
         // Publishing the views.
         /*$this->publishes([
             __DIR__.'/../resources/views' => base_path('resources/views/vendor/carropublic'),
