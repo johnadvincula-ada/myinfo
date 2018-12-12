@@ -20,7 +20,7 @@ $ composer require carropublic/myinfo
 
 ## Usage
 
-Clone to `packages/CarroPublic` and move `ssl` folder to `storage` folder.
+Run `php artisan vendor:publish` which will move `private.pem` and `public.pem` to your `storage/ssl` folder. I got the private/public key pair from MyInfo demo page. You have to use your own
 
 Setup Environment
 
@@ -47,15 +47,15 @@ $ composer test
 
 ## Contributing
 
-Please see [contributing.md](contributing.md) for details and a todolist.
+Please see [contributing.md](contributing.md) for details and a todo list.
 
 ## Security
 
-If you discover any security related issues, please email author email instead of using the issue tracker.
+If you discover any security related issues, please email <a href="mail:universe@carro.co?Subject=Security Bug In MyInfo">author email</a> instead of using the issue tracker.
 
 ## Credits
 
-- [author name][link-author]
+- [Carro.sg][link-author]
 - [All Contributors][link-contributors]
 
 ## License
@@ -67,7 +67,5 @@ license. Please see the [license file](license.md) for more information.
 
 [link-packagist]: https://packagist.org/packages/carropublic/myinfo
 [link-downloads]: https://packagist.org/packages/carropublic/myinfo
-[link-travis]: https://travis-ci.org/carropublic/myinfo
-[link-styleci]: https://styleci.io/repos/12345678
 [link-author]: https://github.com/carropublic
 [link-contributors]: ../../contributors]

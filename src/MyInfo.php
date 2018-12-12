@@ -8,26 +8,27 @@ use Jose\Factory\JWKFactory;
 class MyInfo
 {
     /**
-     * Create authorization URL 
+     * Create authorization URL
      * base on the configuration
-     * 
+     *
      * @return string Authorization URL of MyInfo
      */
     public function createAuthorizeUrl()
     {
-    	$callBackUrl		= config('myinfo.call_back_url');
-    	$myInfoAuthorizeURL = config('myinfo.api.authorise');
-    	$clientId 			= config('myinfo.client_id');
-    	$attributes			= config('myinfo.attributes');
-    	$purpose			= config('myinfo.purpose');
-    	$state 				= 123;
+        $callBackUrl        = config('myinfo.call_back_url');
+        $myInfoAuthorizeURL = config('myinfo.api.authorise');
+        $clientId           = config('myinfo.client_id');
+        $attributes         = config('myinfo.attributes');
+        $purpose            = config('myinfo.purpose');
+        $state              = 123;
 
-    	return "{$myInfoAuthorizeURL}?attributes={$attributes}&client_id={$clientId}&purpose={$purpose}&state={$state}&redirect_uri={$callBackUrl}";
+        return "{$myInfoAuthorizeURL}?attributes={$attributes}&client_id={$clientId}"
+                ."&purpose={$purpose}&state={$state}&redirect_uri={$callBackUrl}";
     }
 
     /**
      * Call the Token API (with the authorization code)
-     * 
+     *
      * @param  string $code Authorization Code
      * @param  string $privateKey privateKey
      * @return mixed
@@ -53,15 +54,15 @@ class MyInfo
         ];
 
         $authHeaders = $this->generateSHA256withRSAHeader(
-                            config('myinfo.api.token'),
-                            $paramArr,
-                            $method,
-                            $contentType,
-                            config('myinfo.client_id'),
-                            $privateKey,
-                            config('myinfo.client_secret'),
-                            config('myinfo.realm')
-                        );
+            config('myinfo.api.token'),
+            $paramArr,
+            $method,
+            $contentType,
+            config('myinfo.client_id'),
+            $privateKey,
+            config('myinfo.client_secret'),
+            config('myinfo.realm')
+        );
 
         return $this->requestWithCurl(
             config('myinfo.api.token'),
@@ -74,7 +75,7 @@ class MyInfo
 
     /**
      * Create person requests
-     * 
+     *
      * @param  string $userUniFin     Fin of the person
      * @param  string $jwtAccessToken JWT access token
      * @param  string $privateKey     Private Key
@@ -92,15 +93,15 @@ class MyInfo
         
         $headers        = array('Cache-Control: ' . $cacheCtl);
         $authHeaders    = $this->generateSHA256withRSAHeader(
-                            $url,
-                            $arrayedParams,
-                            $method,
-                            '',
-                            config('myinfo.client_id'),
-                            $privateKey,
-                            config('myinfo.client_secret'),
-                            config('myinfo.realm')
-                        );
+            $url,
+            $arrayedParams,
+            $method,
+            '',
+            config('myinfo.client_id'),
+            $privateKey,
+            config('myinfo.client_secret'),
+            config('myinfo.realm')
+        );
 
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -128,8 +129,8 @@ class MyInfo
     }
 
     /**
-     * Decrypt encrypted(with JWE) user data to array 
-     * 
+     * Decrypt encrypted(with JWE) user data to array
+     *
      * @param  string $encryptedUserData encrypted user data
      * @param  string $privateKeyPath    Private key to decrypt user data
      * @return array                     Get user data array from inventory
@@ -149,7 +150,7 @@ class MyInfo
         $loader = new Loader();
         $userData = $loader->loadAndDecryptUsingKey(
             $encryptedUserData, // String to load and decrypt
-            $key,               // The symmetric or private key 
+            $key,               // The symmetric or private key
             ['RSA-OAEP'],       // A list of allowed key encryption algorithms
             ['A256GCM'],        // A list of allowed content encryption algorithms
             $recipient_index    // If decrypted, this variable will be set with the recipient index used to decrypt
@@ -160,20 +161,20 @@ class MyInfo
 
     /**
      * Get JWT Payload
-     * 
+     *
      * @param  string $jwtAccessToken JWT Access Token
      * @return array                  Payload of JWT
      */
     public function getJWTPayload($jwtAccessToken)
     {
-        list($header, $payload, $signature) = explode (".", $jwtAccessToken);
+        list($header, $payload, $signature) = explode(".", $jwtAccessToken);
 
         return json_decode(base64_decode($payload), true);
     }
 
     /**
      * Request with CURL
-     * 
+     *
      * @param  string $url         URL to Request
      * @param  string $method      METHOD of the request
      * @param  string $authHeaders Auth
@@ -181,12 +182,12 @@ class MyInfo
      * @param  string $params      Parameter of the request
      * @return mixed
      */
-    private function requestWithCurl($url, $method, $authHeaders=null, $headers=null, $params=null)
+    private function requestWithCurl($url, $method, $authHeaders = null, $headers = null, $params = null)
     {
         $request = curl_init($url);
 
         if ($method === 'POST') {
-            curl_setopt($request, CURLOPT_POST, true);    
+            curl_setopt($request, CURLOPT_POST, true);
         }
         curl_setopt($request, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($request, CURLOPT_SSL_VERIFYPEER, false);
@@ -208,26 +209,36 @@ class MyInfo
         $error  = curl_error($request);
         curl_close($request);
 
-        if ($error)
+        if ($error) {
             return null;
+        }
         
         return $result;
     }
 
     /**
      * Generate SHA256 with RSAHeader
-     * 
+     *
      * @param  string $url            URL
      * @param  string $params         Parameter for header
      * @param  string $method         Method for header generation
-     * @param  string $strContentType Content Type for header 
+     * @param  string $strContentType Content Type for header
      * @param  string $appId          AppId of MyInfo
      * @param  string $keyCertContent PrivateKey content string
      * @param  string $passphrase     Client secret of my info
      * @param  string $realm          URL
      * @return string
      */
-    private function generateSHA256withRSAHeader($url, $params, $method, $strContentType, $appId, $keyCertContent, $passphrase, $realm) {
+    private function generateSHA256withRSAHeader(
+        $url,
+        $params,
+        $method,
+        $strContentType,
+        $appId,
+        $keyCertContent,
+        $passphrase,
+        $realm
+    ) {
         $url = str_replace(".api.gov.sg", ".e.api.gov.sg", $url);
         $nonceValue = $this->generateNonce(32);
         $timestamp = round(microtime(true) * 1000);
@@ -263,7 +274,8 @@ class MyInfo
 
         $strApexHeader = "Apex_l2_eg realm=\"" . $realm . "\",apex_l2_eg_timestamp=\"" . $timestamp .
             "\",apex_l2_eg_nonce=\"" . $nonceValue . "\",apex_l2_eg_app_id=\"" . $appId .
-            "\",apex_l2_eg_signature_method=\"SHA256withRSA\",apex_l2_eg_version=\"1.0\",apex_l2_eg_signature=\"" . $signature_b64 .
+            "\",apex_l2_eg_signature_method=\"SHA256withRSA\",apex_l2_eg_version=\"1.0\","
+            ."apex_l2_eg_signature=\"" . $signature_b64 .
             "\"";
 
         return $strApexHeader;
@@ -272,13 +284,14 @@ class MyInfo
     /**
      * Generate nonce value
      * Wonder what's nonce? - Read on the following wiki link
-     * https://en.wikipedia.org/wiki/Cryptographic_nonce 
-     * 
+     * https://en.wikipedia.org/wiki/Cryptographic_nonce
+     *
      * @param  integer $length   Length of nonce
      * @param  integer $strength Length of strength
      * @return string            Nonce
      */
-    private function generateNonce($length=9, $strength=0) {
+    private function generateNonce($length = 9, $strength = 0)
+    {
         $vowels = 'aeuy';
         $consonants = 'bdghjmnpqrstvz';
         if ($strength & 1) {
