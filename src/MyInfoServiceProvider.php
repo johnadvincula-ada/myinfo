@@ -62,9 +62,9 @@ class MyInfoServiceProvider extends ServiceProvider
         ], 'myinfo.config');
 
         $this->publishes([
-            __DIR__.'/../ssl/private.pem' => storage_path('ssl'),
-            __DIR__.'/../ssl/public.pem'  => storage_path('ssl'),
-        ]);
+            __DIR__.'/../ssl/private.pem' => storage_path('ssl/private.pem'),
+            __DIR__.'/../ssl/public.pem' => storage_path('ssl/public.pem'),
+        ], 'myinfo.ssl');
 
         // Publishing the views.
         /*$this->publishes([
