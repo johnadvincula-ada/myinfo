@@ -67,5 +67,5 @@ license. Please see the [license file](license.md) for more information.
 
 [link-packagist]: https://packagist.org/packages/carropublic/myinfo
 [link-downloads]: https://packagist.org/packages/carropublic/myinfo
-[link-author]: https://github.com/carropublic
+[link-author]: https://github.com/carro-public
 [link-contributors]: ../../contributors]
