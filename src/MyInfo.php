@@ -11,16 +11,16 @@ class MyInfo
      * Create authorization URL
      * base on the configuration
      *
+     * @param  string $state
      * @return string Authorization URL of MyInfo
      */
-    public function createAuthorizeUrl()
+    public function createAuthorizeUrl($state=123)
     {
         $callBackUrl        = config('myinfo.call_back_url');
         $myInfoAuthorizeURL = config('myinfo.api.authorise');
         $clientId           = config('myinfo.client_id');
         $attributes         = config('myinfo.attributes');
         $purpose            = config('myinfo.purpose');
-        $state              = 123;
 
         return "{$myInfoAuthorizeURL}?attributes={$attributes}&client_id={$clientId}"
                 ."&purpose={$purpose}&state={$state}&redirect_uri={$callBackUrl}";
