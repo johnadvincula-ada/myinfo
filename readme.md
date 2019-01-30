@@ -3,10 +3,8 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Please be aware - this is still working in progress.
-
 This is a Laravel Pacakge for [MyInfo](https://www.ndi-api.gov.sg/library/trusted-data/myinfo/introduction). You can read more about MyInfo on their page.
-There is [[PUBLIC] Demo client application for integrating with MyInfo](https://github.com/jamesleegovtech/myinfo-demo-app) which was in Nodejs. So, I implemented my own for PHP base on their Nodejs demo.
+There is [[PUBLIC] Demo client application for integrating with MyInfo](https://github.com/jamesleegovtech/myinfo-demo-app) which was in Nodejs. So, I implemented my own for Laravel Package base on their Nodejs demo.
 
 Take a look at [contributing.md](contributing.md) to see a to do list.
 

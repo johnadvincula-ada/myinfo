@@ -14,7 +14,7 @@ class MyInfo
      * @param  string $state
      * @return string Authorization URL of MyInfo
      */
-    public function createAuthorizeUrl($state=123)
+    public function createAuthorizeUrl($state = 123)
     {
         $callBackUrl        = config('myinfo.call_back_url');
         $myInfoAuthorizeURL = config('myinfo.api.authorise');
