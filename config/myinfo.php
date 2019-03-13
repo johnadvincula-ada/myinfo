@@ -10,7 +10,7 @@ return [
      * Lists of attributes that we want to get from MyInfo
      * Can be read more about it on -
      */
-    'attributes'    => 'name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,assessableincome,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances',
+    'attributes'    => env('MYINFO_ATTRIBUTES'),
 
     /*
      * The Client ID from MyInfo
