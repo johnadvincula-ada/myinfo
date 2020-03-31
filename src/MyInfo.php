@@ -2,6 +2,7 @@
 
 namespace CarroPublic\MyInfo;
 
+use File;
 use Jose\Loader;
 use Jose\Factory\JWKFactory;
 
@@ -12,64 +13,63 @@ class MyInfo
      * base on the configuration
      *
      * @param  string $state
+     * 
      * @return string Authorization URL of MyInfo
      */
-    public function createAuthorizeUrl($state = 123)
+    public function createAuthorizeUrl($state = "123")
     {
-        $callBackUrl        = config('myinfo.call_back_url');
-        $myInfoAuthorizeURL = config('myinfo.api.authorise');
-        $clientId           = config('myinfo.client_id');
-        $attributes         = config('myinfo.attributes');
-        $purpose            = config('myinfo.purpose');
+        $params = [
+            'attributes'    => config('myinfo.attributes'),
+            'client_id'     => config('myinfo.client_id'),
+            'purpose'       => config('myinfo.purpose'),
+            'state'         => $state,
+            'redirect_uri'  => config('myinfo.call_back_url'),
+        ];
 
-        return "{$myInfoAuthorizeURL}?attributes={$attributes}&client_id={$clientId}"
-                ."&purpose={$purpose}&state={$state}&redirect_uri={$callBackUrl}";
+        return urldecode(config('myinfo.api.authorise') . "?". http_build_query($params));
     }
 
     /**
      * Call the Token API (with the authorization code)
      *
      * @param  string $code Authorization Code
-     * @param  string $privateKey privateKey
+     * 
      * @return mixed
      */
-    public function createTokenRequest($code, $privateKey)
+    public function createTokenRequest($code)
     {
-        $cacheCtl       = 'no-cache';
-        $method         = 'POST';
-        $contentType    = 'application/x-www-form-urlencoded';
-
-        $params = 'grant_type=authorization_code' .
-            '&code=' . $code .
-            '&redirect_uri=' . config('myinfo.call_back_url') .
-            '&client_id=' . config('myinfo.client_id') .
-            '&client_secret=' . config('myinfo.client_secret');
-
-        parse_str($params, $paramArr);
-        ksort($paramArr);
-
         $headers = [
-            'Content-Type: ' . $contentType,
-            'Cache-Control: ' . $cacheCtl
+            'Cache-Control' => 'no-cache',
+            'Content-Type'  => 'application/x-www-form-urlencoded',
         ];
+
+        $params = [
+            'grant_type'    => 'authorization_code',
+            'redirect_uri'  => config('myinfo.call_back_url'),
+            'client_id'     => config('myinfo.client_id'),
+            'client_secret' => config('myinfo.client_secret'),
+            'code'          => $code,
+        ];
+
+        $method = 'POST';
 
         $authHeaders = $this->generateSHA256withRSAHeader(
             config('myinfo.api.token'),
-            $paramArr,
+            $params,
             $method,
-            $contentType,
+            $headers['Content-Type'],
             config('myinfo.client_id'),
-            $privateKey,
-            config('myinfo.client_secret'),
-            config('myinfo.realm')
+            config('myinfo.client_secret')
         );
+
+        $headers['Authorization'] = $authHeaders;
 
         return $this->requestWithCurl(
             config('myinfo.api.token'),
             $method,
             $authHeaders,
             $headers,
-            $params
+            http_build_query($params)
         );
     }
 
@@ -78,10 +78,10 @@ class MyInfo
      *
      * @param  string $userUniFin     Fin of the person
      * @param  string $jwtAccessToken JWT access token
-     * @param  string $privateKey     Private Key
+     *
      * @return mixed
      */
-    public function createPersonRequest($userUniFin, $jwtAccessToken, $privateKey)
+    public function createPersonRequest($userUniFin, $jwtAccessToken)
     {
         $url            = config('myinfo.api.personal') . '/' . $userUniFin . '/';
         $cacheCtl       = 'no-cache';
@@ -98,9 +98,7 @@ class MyInfo
             $method,
             '',
             config('myinfo.client_id'),
-            $privateKey,
-            config('myinfo.client_secret'),
-            config('myinfo.realm')
+            config('myinfo.client_secret')
         );
 
         $curl = curl_init($url);
@@ -131,9 +129,13 @@ class MyInfo
     /**
      * Decrypt encrypted(with JWE) user data to array
      *
+     * https://jwt.io/ (HS256)
+     * 
+     *  https://web-token.spomky-labs.com/v/v1.x/migration/from-spomky-labs-jose/encrypted-tokens-jwe
+     *
      * @param  string $encryptedUserData encrypted user data
-     * @param  string $privateKeyPath    Private key to decrypt user data
-     * @return array                     Get user data array from inventory
+     * 
+     * @return array Get user data array from inventory
      */
     public function getUserData($encryptedUserData, $privateKeyPath)
     {
@@ -155,8 +157,8 @@ class MyInfo
             ['A256GCM'],        // A list of allowed content encryption algorithms
             $recipient_index    // If decrypted, this variable will be set with the recipient index used to decrypt
         );
-
-        return $userData->getPayload();
+        
+        return $this->getJWTPayload($userData->getPayload());
     }
 
     /**
@@ -177,9 +179,10 @@ class MyInfo
      *
      * @param  string $url         URL to Request
      * @param  string $method      METHOD of the request
-     * @param  string $authHeaders Auth
-     * @param  array  $headers     Request headers
-     * @param  string $params      Parameter of the request
+     * @param  ?string $authHeaders Auth
+     * @param  ?array  $headers     Request headers
+     * @param  ?string $params      Parameter of the request
+     * 
      * @return mixed
      */
     private function requestWithCurl($url, $method, $authHeaders = null, $headers = null, $params = null)
@@ -189,6 +192,7 @@ class MyInfo
         if ($method === 'POST') {
             curl_setopt($request, CURLOPT_POST, true);
         }
+
         curl_setopt($request, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($request, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($request, CURLOPT_SSL_VERIFYHOST, false);
@@ -226,7 +230,7 @@ class MyInfo
      * @param  string $appId          AppId of MyInfo
      * @param  string $keyCertContent PrivateKey content string
      * @param  string $passphrase     Client secret of my info
-     * @param  string $realm          URL
+     * 
      * @return string
      */
     private function generateSHA256withRSAHeader(
@@ -235,50 +239,44 @@ class MyInfo
         $method,
         $strContentType,
         $appId,
-        $keyCertContent,
-        $passphrase,
-        $realm
+        $passphrase
     ) {
-        $url = str_replace(".api.gov.sg", ".e.api.gov.sg", $url);
         $nonceValue = $this->generateNonce(32);
         $timestamp = round(microtime(true) * 1000);
         
-        $defaultApexHeaders =
-            "apex_l2_eg_app_id=" . $appId .
-            "&apex_l2_eg_nonce=" . $nonceValue .
-            "&apex_l2_eg_signature_method=SHA256withRSA" .
-            "&apex_l2_eg_timestamp=" . $timestamp .
-            "&apex_l2_eg_version=1.0";
-
-        parse_str($defaultApexHeaders, $arrayedDefaultApexHeaders);
+        $defaultApexHeaders = [
+            'app_id'           => $appId,
+            'nonce'            => $nonceValue,
+            'signature_method' => 'RS256',
+            'timestamp'        => $timestamp,
+        ];
 
         if ($method == 'POST' && $strContentType != 'application/x-www-form-urlencoded') {
             $params = [];
         }
 
-        $baseParams = array_merge($arrayedDefaultApexHeaders, $params);
+        $baseParams = array_merge($defaultApexHeaders, $params);
+        ksort($baseParams);
 
-        $baseParamsStr = http_build_query($baseParams);
-        $baseParamsStr = str_replace(array('%3A','%2F','%2C'), array(':','/',','), $baseParamsStr);
+        $baseParamsStr = urldecode(http_build_query($baseParams));
 
         $baseString = strtoupper($method) . '&' . $url . '&' . $baseParamsStr;
 
-        $signWith = [$keyCertContent];
+        $privateKey = File::get(storage_path('ssl/private.pem'));
 
+        $signWith[] = $privateKey;
         if (isset($passphrase) && !empty($passphrase)) {
-            $signWith[1] = $passphrase;
+            $signWith[] = $passphrase;
         }
 
         openssl_sign($baseString, $signature, $signWith, 'sha256WithRSAEncryption');
-        $signature_b64 = base64_encode($signature);
 
-        $strApexHeader = "Apex_l2_eg realm=\"" . $realm . "\",apex_l2_eg_timestamp=\"" . $timestamp .
-            "\",apex_l2_eg_nonce=\"" . $nonceValue . "\",apex_l2_eg_app_id=\"" . $appId .
-            "\",apex_l2_eg_signature_method=\"SHA256withRSA\",apex_l2_eg_version=\"1.0\","
-            ."apex_l2_eg_signature=\"" . $signature_b64 .
-            "\"";
-
-        return $strApexHeader;
+        return 'PKI_SIGN timestamp="'.$timestamp.
+                '",nonce="'.$nonceValue.
+                '",app_id="'.$appId.
+                '",signature_method="RS256"'.
+                ',signature="'. base64_encode($signature) .
+                '"';
     }
 
     /**
