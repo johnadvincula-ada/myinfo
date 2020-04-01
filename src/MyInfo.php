@@ -14,7 +14,7 @@ class MyInfo
      * base on the configuration
      *
      * @param  string $state
-     * 
+     *
      * @return string Authorization URL of MyInfo
      */
     public function createAuthorizeUrl($state = "123")
@@ -34,7 +34,7 @@ class MyInfo
      * Call the Token API (with the authorization code)
      *
      * @param  string $code Authorization Code
-     * 
+     *
      * @return mixed
      */
     public function createTokenRequest($code)
@@ -125,11 +125,11 @@ class MyInfo
      * Decrypt encrypted(with JWE) user data to array
      *
      * https://jwt.io/ (HS256)
-     * 
+     *
      *  https://web-token.spomky-labs.com/v/v1.x/migration/from-spomky-labs-jose/encrypted-tokens-jwe
      *
      * @param  string $encryptedUserData encrypted user data
-     * 
+     *
      * @return array Get user data array from inventory
      */
     public function getUserData($encryptedUserData, $privateKeyPath)
@@ -160,7 +160,7 @@ class MyInfo
      * Get JWT Payload
      *
      * @param  string $jwtAccessToken JWT Access Token
-     * 
+     *
      * @return array                  Payload of JWT
      */
     public function getJWTPayload($jwtAccessToken)
@@ -180,7 +180,7 @@ class MyInfo
      * @param  string $appId          AppId of MyInfo
      * @param  string $keyCertContent PrivateKey content string
      * @param  string $passphrase     Client secret of my info
-     * 
+     *
      * @return string
      */
     private function generateSHA256withRSAHeader(
@@ -232,12 +232,12 @@ class MyInfo
     /**
      * Generate nonce value
      * Wonder what's nonce? - Read on the following wiki link
-     * 
+     *
      * https://en.wikipedia.org/wiki/Cryptographic_nonce
      *
      * @param  integer $length   Length of nonce
      * @param  integer $strength Length of strength
-     * 
+     *
      * @return string            Nonce
      */
     private function generateNonce($length = 9, $strength = 0)

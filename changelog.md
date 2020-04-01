@@ -2,6 +2,13 @@
 
 All notable changes to `MyInfo` will be documented in this file.
 
+## Version 2.0.0
+
+### Changes Lists
+
+- Update to MyInfo v3
+- Use guzzle instead of curl
+
 ## Version 1.0.1
 
 ### Changes Lists
