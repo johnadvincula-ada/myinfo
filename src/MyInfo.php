@@ -4,6 +4,7 @@ namespace CarroPublic\MyInfo;
 
 use File;
 use Jose\Loader;
+use GuzzleHttp\Client;
 use Jose\Factory\JWKFactory;
 
 class MyInfo
@@ -64,13 +65,14 @@ class MyInfo
 
         $headers['Authorization'] = $authHeaders;
 
-        return $this->requestWithCurl(
-            config('myinfo.api.token'),
-            $method,
-            $authHeaders,
-            $headers,
-            http_build_query($params)
-        );
+        $http = new Client;
+
+        $response = $http->post(config('myinfo.api.token'), [
+            'form_params' => $params,
+            'headers' => $headers,
+        ]);
+
+        return $response->getBody();
     }
 
     /**
@@ -84,46 +86,39 @@ class MyInfo
     public function createPersonRequest($userUniFin, $jwtAccessToken)
     {
         $url            = config('myinfo.api.personal') . '/' . $userUniFin . '/';
-        $cacheCtl       = 'no-cache';
-        $method         = 'GET';
-        $contentType    = 'application/x-www-form-urlencoded';
-        $params         = 'attributes=' . config('myinfo.attributes') . '&client_id=' . config('myinfo.client_id');
 
-        parse_str($params, $arrayedParams);
-        
-        $headers        = array('Cache-Control: ' . $cacheCtl);
+        $params = [
+            'attributes' => config('myinfo.attributes'),
+            'client_id' => config('myinfo.client_id')
+        ];
+
+        $headers = [
+            'Cache-Control' => 'no-cache',
+        ];
+
         $authHeaders    = $this->generateSHA256withRSAHeader(
             $url,
-            $arrayedParams,
-            $method,
+            $params,
+            'GET',
             '',
             config('myinfo.client_id'),
             config('myinfo.client_secret')
         );
 
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-
         if (!empty($authHeaders)) {
-            $headers[] = "Authorization: " . $authHeaders . ",Bearer " . $jwtAccessToken;
+            $headers['Authorization'] = $authHeaders . ",Bearer " . $jwtAccessToken;
         } else {
-            $headers[] = "Authorization: Bearer " . $jwtAccessToken;
+            $headers['Authorization'] = "Bearer " . $jwtAccessToken;
         }
 
-        if (isset($headers) || !empty($headers)) {
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        }
+        $http = new Client;
 
-        if (isset($params) && !empty($params)) {
-            curl_setopt($curl, CURLOPT_URL, $url . '?' . $params);
-        }
+        $response = $http->get($url, [
+            'query' => $params,
+            'headers' => $headers,
+        ]);
 
-        $request = curl_exec($curl);
-        curl_close($curl);
-        
-        return $request;
+        return $response->getBody()->getContents();
     }
 
     /**
@@ -165,6 +160,7 @@ class MyInfo
      * Get JWT Payload
      *
      * @param  string $jwtAccessToken JWT Access Token
+     * 
      * @return array                  Payload of JWT
      */
     public function getJWTPayload($jwtAccessToken)
@@ -172,52 +168,6 @@ class MyInfo
         list($header, $payload, $signature) = explode(".", $jwtAccessToken);
 
         return json_decode(base64_decode($payload), true);
-    }
-
-    /**
-     * Request with CURL
-     *
-     * @param  string $url         URL to Request
-     * @param  string $method      METHOD of the request
-     * @param  ?string $authHeaders Auth
-     * @param  ?array  $headers     Request headers
-     * @param  ?string $params      Parameter of the request
-     * 
-     * @return mixed
-     */
-    private function requestWithCurl($url, $method, $authHeaders = null, $headers = null, $params = null)
-    {
-        $request = curl_init($url);
-
-        if ($method === 'POST') {
-            curl_setopt($request, CURLOPT_POST, true);
-        }
-
-        curl_setopt($request, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($request, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($request, CURLOPT_SSL_VERIFYHOST, false);
-
-        if (!empty($authHeaders)) {
-            $headers[] = 'Authorization: ' . $authHeaders;
-        }
-
-        if (isset($headers) && !empty($headers)) {
-            curl_setopt($request, CURLOPT_HTTPHEADER, $headers);
-        }
-
-        if (isset($params) && !empty($params)) {
-            curl_setopt($request, CURLOPT_POSTFIELDS, $params);
-        }
-
-        $result = curl_exec($request);
-        $error  = curl_error($request);
-        curl_close($request);
-
-        if ($error) {
-            return null;
-        }
-        
-        return $result;
     }
 
     /**
@@ -282,10 +232,12 @@ class MyInfo
     /**
      * Generate nonce value
      * Wonder what's nonce? - Read on the following wiki link
+     * 
      * https://en.wikipedia.org/wiki/Cryptographic_nonce
      *
      * @param  integer $length   Length of nonce
      * @param  integer $strength Length of strength
+     * 
      * @return string            Nonce
      */
     private function generateNonce($length = 9, $strength = 0)
