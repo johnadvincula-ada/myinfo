@@ -212,7 +212,7 @@ class MyInfo
 
         $baseString = strtoupper($method) . '&' . $url . '&' . $baseParamsStr;
 
-        $privateKey = File::get(storage_path('ssl/private.pem'));
+        $privateKey = File::get(base_path('ssl/private.pem'));
 
         $signWith[] = $privateKey;
         if (isset($passphrase) && !empty($passphrase)) {
